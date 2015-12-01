@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd $HOME
+sudo apt-get install python
 
 wget https://nodejs.org/dist/v4.2.2/node-v4.2.2.tar.gz
 tar zxf node-v4.2.2.tar.gz
