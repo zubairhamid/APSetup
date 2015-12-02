@@ -96,12 +96,12 @@
         defineHttpServerBlock: function(config){
             this.configFileData += 'server {\n'+
                 'listen 80;\n'+
-                'server_name '+ config.domainName +' *'+ config.domainName +';\n\n';
+                'server_name '+ config.domainName +' *.'+ config.domainName +';\n\n';
         },
         defineHttpsServerBlock: function(config){
             this.configFileData += 'server {\n'+
                 'listen         80;\n'+
-                'server_name    '+ config.domainName +' *'+ config.domainName +';\n'+
+                'server_name    '+ config.domainName +' *.'+ config.domainName +';\n'+
                 'return 301 https://'+ config.domainName +'$request_uri;\n'+
                 '}\n\n'+
                 'server {\n'+
