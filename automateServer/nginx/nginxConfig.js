@@ -5,10 +5,10 @@
     var configureNginx = function(){
         this.configFileData = '';
         this.proxyArray = [];
-        this.supportedStaticFile = 'ico|html|css|js|gif|jpe?g|png|woff|ttf|json|csv';
+        this.supportedStaticFile = 'css|js|json|html|gif|jpg|png|ico|eot|svg|ttf|woff|woff2|pdf|htm|xml';
         this.supportedProtocols = 'TLSv1 TLSv1.1 TLSv1.2';
         this.mimeTypes = 'text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript';
-        this.supportedCiphers = 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK';
+        this.supportedCiphers = '"EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4"';
     };
 
     configureNginx.prototype = {
@@ -52,7 +52,8 @@
                     "serverPath"            : this.location[i].serverPath,
                     "locationTo"            : this.location[i].route,
                     "nodeProxyIp"           : this.location[i].proxyIp,
-                    "x-config"              : this.location[i].serverConfigName
+                    "x-config"              : this.location[i].serverConfigName,
+                    "x-service-from"        : this.location[i].serviceFrom
                 };
 
                 if(typeof locationConfig.locationTo == "string" && locationConfig.locationTo != ''){
@@ -68,7 +69,11 @@
             return foundConfigIp;
         },
         defineContentBlock: function(config){
-            this.configFileData += 'location ~ \\.(?:'+ this.supportedStaticFile +')$ {\n'+
+            this.configFileData += 'location ~* \\.(?:'+ this.supportedStaticFile +')$ {\n'+
+                'add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
+                'add_header X-Frame-Options "SAMEORIGIN";\n'+
+                'add_header X-Content-Type-Options nosniff;\n'+
+                'add_header X-XSS-Protection "1; mode=block";\n'+
                 'root '+ config.staticContentPath +';\n'+
                 'expires  -1;\n'+
                 '}\n\n';
@@ -85,6 +90,15 @@
                 'proxy_set_header   Connection "upgrade";\n'+
                 'proxy_set_header   X-NginX-Proxy    true;\n'+
                 'proxy_set_header   X-Request-Id $txid;\n'+
+                'proxy_set_header   X-NginX-Proxy    true;\n'+
+                'proxy_set_header   x-config   "'+ config["x-config"] +'";\n'+
+                'proxy_set_header   X-Service-From   "'+ config["x-service-from"] +'";\n'+
+                'proxy_set_header   X-Request-Id $txid;\n'+
+                'proxy_set_header   X-Auth-Server   true;\n'+
+                'add_header         X-Frame-Options "SAMEORIGIN";\n'+
+                'add_header         X-Content-Type-Options nosniff;\n'+
+                'add_header         X-XSS-Protection "1; mode=block";\n'+
+                'add_header         Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
                 'proxy_redirect     off;\n'+
                 '}\n\n';
         },
@@ -102,16 +116,21 @@
             this.configFileData += 'server {\n'+
                 'listen         80;\n'+
                 'server_name    '+ config.domainName +' *.'+ config.domainName +';\n'+
+                'add_header     X-Frame-Options "SAMEORIGIN";\n'+
+                'add_header     X-Content-Type-Options nosniff;\n'+
+                'add_header     X-XSS-Protection "1; mode=block";\n'+
+                'add_header     Content-Security-Policy "default-src https";\n'+
                 'return 301 https://'+ config.domainName +'$request_uri;\n'+
                 '}\n\n'+
                 'server {\n'+
-                'listen                     443 ssl spdy;\n'+
+                'listen                     443 ssl http2;\n'+
                 'server_name                '+ config.domainName +' *'+ config.domainName +';\n\n'+
                 'ssl                        on;\n'+
                 'ssl_certificate            /usr/local/nginx/ssl/'+ config.domainName +'/mycert.pem;\n'+
                 'ssl_certificate_key        /usr/local/nginx/ssl/'+ config.domainName +'/mycert.key;\n\n'+
                 'ssl_protocols              '+ this.supportedProtocols +';\n'+
-                'ssl_ciphers                '+ this.supportedCiphers +';\n'+
+                'ssl_ciphers                '+ this.supportedCiphers +';\n\n'+
+                'ssl_dhparam                /etc/ssl/certs/dhparam.pem;\n'+
                 'ssl_prefer_server_ciphers  on;\n\n';
         },
         defineServerBlockClose: function(config){
