@@ -64,7 +64,7 @@
         },
         checkProxyServerBlock: function(config , proxyname){
             var proxyConfig = { ip : config.proxyIp, nodeProxyName : proxyname };
-            var foundConfigIp =  _.findWhere(this.proxyArray , { ip: proxyConfig.ip});
+            var foundConfigIp =  _.find(this.proxyArray , { ip: proxyConfig.ip});
             if(!foundConfigIp) this.proxyArray.push(proxyConfig);
             return foundConfigIp;
         },
@@ -91,7 +91,6 @@
                 'proxy_set_header   X-NginX-Proxy    true;\n'+
                 'proxy_set_header   X-Request-Id $txid;\n'+
                 'proxy_set_header   X-NginX-Proxy    true;\n'+
-                'proxy_set_header   x-config   "'+ config["x-config"] +'";\n'+
                 'proxy_set_header   X-Service-From   "'+ config["x-service-from"] +'";\n'+
                 'proxy_set_header   X-Request-Id $txid;\n'+
                 'proxy_set_header   X-Auth-Server   true;\n'+
