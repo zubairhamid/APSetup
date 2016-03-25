@@ -70,6 +70,7 @@ description "nginx http daemon"
 author "zubair hamid <zubairhamid@cloudmpower.com>"
 
 start on (filesystem and net-device-up IFACE=lo)
+stop on runlevel [!2345]
 
 env DAEMON=/usr/local/nginx/sbin/nginx
 env PID=/var/run/nginx.pid
