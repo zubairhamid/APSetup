@@ -22,23 +22,18 @@
 # pidfile:     /usr/local/nginx/logs/nginx.pid
 # Provides:    nginx
 #
-# Author:  Jason Giedymin
-#          <jason.giedymin AT gmail.com>.
+# Author:  Zubair Hamid
+#          <zubairhamid AT cloudmpower.com>.
 #
-# Version: 3.6.0 30-JAN-2014 jason.giedymin AT gmail.com
 # Notes: nginx init.d dash script for Ubuntu.
-# Tested with: Ubuntu 13.10, nginx-1.5.9
+# Tested with: Ubuntu 14.10, nginx-1.9.11
 #
-# This script's project home is:
-#   http://github.com/JasonGiedymin/nginx-init-ubuntu
 #
 #------------------------------------------------------------------------------
 #                               MIT X11 License
 #------------------------------------------------------------------------------
-
-
 #
-# Copyright (c) 2008-2013 Jason Giedymin, http://jasongiedymin.com
+# Copyright (c) 2008-2019 Zubair Hamid
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -61,7 +56,7 @@
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-#                               Functions
+#                               Function
 #------------------------------------------------------------------------------
 
 LSB_FUNC=/lib/lsb/init-functions

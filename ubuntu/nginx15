@@ -1,0 +1,89 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          nginx
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: nginx init.d dash script for Ubuntu or other *nix.
+# Description:       nginx init.d dash script for Ubuntu or other *nix.
+### END INIT INFO
+#------------------------------------------------------------------------------
+# nginx - this Debian Almquist shell (dash) script, starts and stops the nginx
+#         daemon for Ubuntu and other *nix releases.
+#
+# description:  Nginx is an HTTP(S) server, HTTP(S) reverse \
+#               proxy and IMAP/POP3 proxy server.  This \
+#               script will manage the initiation of the \
+#               server and it's process state.
+#
+# processname: nginx
+# Provides:    nginx
+#
+# Author:  Zubair Hamid
+#          <zubairhamid AT cloudmpower.com>.
+#
+# Notes: nginx init.d dash script for Ubuntu.
+# Tested with: Ubuntu 15.10, nginx-1.9.11
+#
+#
+#------------------------------------------------------------------------------
+#                               MIT X11 License
+#------------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2019 Zubair Hamid
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+#                               Function
+#------------------------------------------------------------------------------
+
+LSB_FUNC=/lib/lsb/init-functions
+
+# Test that init functions exists
+test -r $LSB_FUNC || {
+    echo "$0: Cannot find $LSB_FUNC! Script exiting." 1>&2
+    exit 5
+}
+
+. $LSB_FUNC
+description "nginx http daemon"
+author "zubair hamid <zubairhamid@cloudmpower.com>"
+
+start on (filesystem and net-device-up IFACE=lo)
+
+env DAEMON=/usr/local/nginx/sbin/nginx
+env PID=/var/run/nginx.pid
+
+expect fork
+respawn
+respawn limit 10 5
+#oom never
+
+pre-start script
+        $DAEMON -t
+        if [ $? -ne 0 ]
+                then exit $?
+        fi
+end script
+
+exec $DAEMON
