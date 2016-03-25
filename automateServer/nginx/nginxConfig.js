@@ -70,10 +70,11 @@
         },
         defineContentBlock: function(config){
             this.configFileData += 'location ~* \\.(?:'+ this.supportedStaticFile +')$ {\n'+
-                'add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
-                'add_header X-Frame-Options "SAMEORIGIN";\n'+
-                'add_header X-Content-Type-Options nosniff;\n'+
-                'add_header X-XSS-Protection "1; mode=block";\n'+
+                'add_header     Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
+                'add_header     X-Frame-Options "SAMEORIGIN";\n'+
+                'add_header     X-Content-Type-Options nosniff;\n'+
+                'add_header     X-XSS-Protection "1; mode=block";\n'+
+                'add_header     Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
                 'root '+ config.staticContentPath +';\n'+
                 'expires  -1;\n'+
                 '}\n\n';
@@ -97,6 +98,7 @@
                 'add_header         X-Frame-Options "SAMEORIGIN";\n'+
                 'add_header         X-Content-Type-Options nosniff;\n'+
                 'add_header         X-XSS-Protection "1; mode=block";\n'+
+                'add_header         Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
                 'add_header         Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
                 'proxy_redirect     off;\n'+
                 '}\n\n';
@@ -118,7 +120,7 @@
                 'add_header     X-Frame-Options "SAMEORIGIN";\n'+
                 'add_header     X-Content-Type-Options nosniff;\n'+
                 'add_header     X-XSS-Protection "1; mode=block";\n'+
-                'add_header     Content-Security-Policy "default-src https";\n'+
+                'add_header     Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
                 'return 301 https://'+ config.domainName +'$request_uri;\n'+
                 '}\n\n'+
                 'server {\n'+
