@@ -5,7 +5,7 @@
     var configureNginx = function(){
         this.configFileData = '';
         this.proxyArray = [];
-        this.supportedStaticFile = 'css|js|json|html|gif|jpg|png|ico|eot|svg|ttf|woff|woff2|pdf|htm|xml';
+        this.supportedStaticFile = 'css|js|json|html|gif|jpg|png|ico|eot|svg|ttf|woff|woff2|pdf|htm|xml|mp3';
         this.supportedProtocols = 'TLSv1 TLSv1.1 TLSv1.2';
         this.mimeTypes = 'text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript';
         this.supportedCiphers = '"EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4"';
