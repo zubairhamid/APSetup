@@ -1,10 +1,10 @@
 [Unit]
 Description=The NGINX HTTP and reverse proxy server
-After=network-online.target syslog.target network.target remote-fs.target nss-lookup.target
+After=syslog.target network.target
 
 [Service]
 Type=forking
-PIDFile=/var/run/nginx.pid
+PIDFile=/usr/local/nginx/logs/nginx.pid
 ExecStartPre=/usr/local/nginx/sbin/nginx -t
 ExecStart=/usr/local/nginx/sbin/nginx
 ExecReload=/bin/kill -s HUP $MAINPID
