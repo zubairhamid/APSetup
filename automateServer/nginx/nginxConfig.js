@@ -70,20 +70,13 @@
         },
         defineContentBlock: function(config){
             this.configFileData += 'location ~* \\.(?:'+ this.supportedStaticFile +')$ {\n'+
-                'add_header     Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
-                'add_header     X-Frame-Options "SAMEORIGIN";\n'+
-                'add_header     X-Content-Type-Options nosniff;\n'+
-                'add_header     X-XSS-Protection "1; mode=block";\n'+
-                'add_header     Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
                 'root '+ config.staticContentPath +';\n'+
                 'expires  -1;\n'+
                 '}\n\n';
         },
         defineLocationBlock: function(config){
             this.configFileData += 'location '+ config.locationTo + ' {\n'+
-                'alias '+config.serverPath + ';\n'+
                 'proxy_pass         http://'+ config.nodeProxyName +';\n'+
-                'proxy_set_header   X-IBanking   "127.0.0.1";\n'+
                 'proxy_set_header   X-Real-IP    $remote_addr;\n'+
                 'proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;\n'+
                 'proxy_http_version 1.1;\n'+
@@ -91,15 +84,7 @@
                 'proxy_set_header   Connection "upgrade";\n'+
                 'proxy_set_header   X-NginX-Proxy    true;\n'+
                 'proxy_set_header   X-Request-Id $txid;\n'+
-                'proxy_set_header   X-NginX-Proxy    true;\n'+
-                'proxy_set_header   X-Service-From   "'+ config["x-service-from"] +'";\n'+
-                'proxy_set_header   X-Request-Id $txid;\n'+
                 'proxy_set_header   X-Auth-Server   true;\n'+
-                'add_header         X-Frame-Options "SAMEORIGIN";\n'+
-                'add_header         X-Content-Type-Options nosniff;\n'+
-                'add_header         X-XSS-Protection "1; mode=block";\n'+
-                'add_header         Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
-                'add_header         Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
                 'proxy_redirect     off;\n'+
                 '}\n\n';
         },
@@ -109,7 +94,7 @@
                 '}\n\n' +  this.configFileData;
         },
         defineHttpServerBlock: function(config){
-            this.configFileData += 'server {\n'+
+            this.configFileData += 'server {\n\n'+
                 'listen 80;\n'+
                 'server_name '+ config.domainName +' *.'+ config.domainName +';\n\n';
         },
@@ -117,22 +102,23 @@
             this.configFileData += 'server {\n'+
                 'listen         80;\n'+
                 'server_name    '+ config.domainName +' *.'+ config.domainName +';\n'+
-                'add_header     X-Frame-Options "SAMEORIGIN";\n'+
-                'add_header     X-Content-Type-Options nosniff;\n'+
-                'add_header     X-XSS-Protection "1; mode=block";\n'+
-                'add_header     Content-Security-Policy "default-src https:; script-src \'unsafe-eval\' https:; connect-src \'self\'; img-src data: \'self\' https:; style-src \'unsafe-inline\' https:; font-src \'self\' https:;";\n'+
                 'return 301 https://'+ config.domainName +'$request_uri;\n'+
                 '}\n\n'+
-                'server {\n'+
+                'server {\n\n'+
                 'listen                     443 ssl http2;\n'+
                 'server_name                '+ config.domainName +' *'+ config.domainName +';\n\n'+
                 'ssl                        on;\n'+
-                'ssl_certificate            /usr/local/nginx/ssl/'+ config.domainName +'/mycert.pem;\n'+
-                'ssl_certificate_key        /usr/local/nginx/ssl/'+ config.domainName +'/mycert.key;\n\n'+
+                'ssl_certificate            /etc/letsencrypt/live/'+ config.domainName +'/fullchain.pem;\n'+
+                'ssl_certificate_key        /etc/letsencrypt/live/'+ config.domainName +'/privkey.pem;\n\n'+
                 'ssl_protocols              '+ this.supportedProtocols +';\n'+
                 'ssl_ciphers                '+ this.supportedCiphers +';\n\n'+
                 'ssl_dhparam                /etc/ssl/certs/dhparam.pem;\n'+
-                'ssl_prefer_server_ciphers  on;\n\n';
+                'ssl_prefer_server_ciphers  on;\n\n'+
+                'add_header     Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";\n'+
+                'add_header     X-Frame-Options "SAMEORIGIN";\n'+
+                'add_header     X-Content-Type-Options nosniff;\n'+
+                'add_header     X-XSS-Protection "1; mode=block";\n'+
+                'add_header     Referrer-Policy "strict-origin";\n\n';
         },
         defineServerBlockClose: function(config){
             var closeBlock = '';
@@ -143,6 +129,11 @@
                 'gzip_types '+ this.mimeTypes +';\n'+
                 'gzip_buffers 16 8k;\n'+
                 'gzip_vary on;\n'+
+                'gzip_static on;\n\n'+
+                'brotli on;\n'+
+                'brotli_static on;\n'+
+                'brotli_types '+ this.mimeTypes +';\n'+
+                'brotli_buffers 16 8k;\n'+
                 '}';
 
             this.configFileData += closeBlock;
@@ -152,8 +143,8 @@
                 'Step1: Copy '+ config.name +' to path /usr/local/nginx/sites-enabled\n'+
                 'Step2: Copy nginx.conf to path /usr/local/nginx/conf\n';
 
-            var forHttps = 'Step3: Copy your ssl .pem file to /usr/local/nginx/ssl/'+ config.domainName +'/mycert.pem\n'+
-                'Step4: Copy your ssl .key file to /usr/local/nginx/ssl/'+ config.domainName +'/mycert.key\n'+
+            var forHttps = 'Step3: Copy your ssl .pem file to /etc/letsencrypt/live/'+ config.domainName +'/fullchain.pem\n'+
+                'Step4: Copy your ssl .key file to /etc/letsencrypt/live/'+ config.domainName +'/privkey.pem\n'+
                 'Step5: Please restart nginx for the changes to take effect';
 
             if(config.https) return console.log(responseSteps + forHttps);
