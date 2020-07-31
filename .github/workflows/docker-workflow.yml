@@ -1,12 +1,6 @@
 name: Docker Create
 # This workflow is triggered on pushes to the repository.
-on: 
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'Repository Owner'
-        required: true
-        default: 'cloudmpower'
+on: push
 
 jobs:
   build:
