@@ -13,4 +13,4 @@ COPY --from=build /etc/docker/daemon.json /etc/docker/daemon.json
 
 EXPOSE 9999
 #CMD test.js
-CMD ["node", "test.js"]
+CMD ["test.js"]
