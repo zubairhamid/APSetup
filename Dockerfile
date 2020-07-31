@@ -1,7 +1,7 @@
 FROM node:14.4.0 as build
 
 WORKDIR /APSetup
-COPY ./APSetup /APSetup
+COPY ./ /APSetup
 COPY daemon.json /etc/docker/daemon.json
 #COPY exchange.sh /service_name_entry/exchange.sh
 
