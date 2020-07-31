@@ -4,12 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: 'Person to greet'
+        description: 'Repository Owner'
         required: true
-        default: 'Mona the Octocat'
-      home:
-        description: 'location'
-        required: false
+        default: 'cloudmpower'
 
 jobs:
   build:
